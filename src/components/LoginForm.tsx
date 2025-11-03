@@ -1,73 +1,50 @@
-import { type ChangeEvent, useReducer } from 'react';
-import { type FormEvent } from 'react';
-import InputField from './InputField';
-import { formReducer, initialState, type FormField, } from '../utils/formReducer';
-import { type FocusEvent } from 'react';
-import { FormActionType } from '../utils/formReducer';
+import { Formik } from 'formik';
+import { Form } from 'formik';
+import { object, string } from 'yup';
+import FormField from './FormField';
+
+const validationSchema = object({
+  login: string().required('Login is required').min(3, 'Login must be at least 3 chracters').max(20, 'Login must be less than 20 characters'),
+  password: string().required('Password is required').min(6, 'Password must be at least 6 characters').max(32, 'Password must be less than 32 characters'),
+})
+
+const initialValues = {
+  login: '',
+  password: '',
+}
+
+const handleSubmit = (values: typeof initialValues) => {
+  console.log(values)
+}
+
+const randomSuffix = () => Math.random().toString(36).substring(2, 15);
 
 const LoginForm = () => {
-  const [state, dispatch] = useReducer(formReducer, initialState);
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target as { name: FormField; value: string }
-
-    dispatch({ type: FormActionType.SET_FIELD, field: name, value })
-
-    if (state.touched[name]) {
-      dispatch({ type: FormActionType.VALIDATE_FIELD, field: name })
-    }
-  }
-
-  const handleBlur = (e: FocusEvent<HTMLInputElement>) => {
-    const { name } = e.target as { name: FormField }
-    dispatch({ type: FormActionType.SET_TOUCHED, field: name })
-    dispatch({ type: FormActionType.VALIDATE_FIELD, field: name })
-  }
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
-    dispatch({ type: FormActionType.VALIDATE_ALL })
-
-    const hasErrors = Object.values(state.errors).some((error) => error !== '')
-
-    if (!hasErrors) {
-      console.log('Form has errors:', state.errors)
-      return
-    }
-    console.log('Form submitted successfully with data:', state)
-  }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <InputField
-        id="login"
-        name="login"
-        label="Login"
-        type="text"
-        value={state.login}
-        error={state.errors.login}
-        isTouched={state.touched.login}
-        placeholder='Enter your login'
-        autoComplete='username'
-        onChange={handleChange}
-        onBlur={handleBlur}
-      />
-      <InputField
-        id="password"
-        name="password"
-        label="Password"
-        type="password"
-        value={state.password}
-        error={state.errors.password}
-        isTouched={state.touched.password}
-        placeholder='Enter your password'
-        autoComplete='current-password'
-        onChange={handleChange}
-        onBlur={handleBlur}
-      />
-      <button type="submit">Login</button>
-    </form>
+    <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}
+      validateOnChange={true} validateOnMount={true}>
+      {({ isValid, errors }) => {
+        return (
+          <Form>
+            <FormField id={`login-${randomSuffix}`} label='login' name='login' successMessage='Login is valid' placeholder='Enter your login' error={errors.login} autoComplete='username'></FormField>
+            <FormField
+              id={`password-${randomSuffix}`}
+              label='Password'
+              name='password'
+              type='password'
+              placeholder='Enter your password'
+              autoComplete='new-password'
+              successMessage='Password is valid'
+              error={errors.password}
+            >
+
+            </FormField>
+            <button type="submit" disabled={!isValid}>Login</button>
+          </Form>
+        )
+      }}
+    </Formik >
   );
 };
 
