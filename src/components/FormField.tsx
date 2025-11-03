@@ -18,7 +18,7 @@ const FormField = ({ id, name, label, type = "text", placeholder = "Enter your v
       <label htmlFor={id}>{label}</label>
       <Field
         id={id} name={name} type={type} placeholder={placeholder} autoComplete={autoComplete} />
-      <ErrorMessage name={name} component="div" className="text-danger" />
+      <ErrorMessage name={name} component="div" className="error-text" />
       <SuccessMessage message={successMessage} error={error} />
     </div>
   )

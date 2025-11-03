@@ -5,7 +5,7 @@ type SuccessMessageProps = {
 
 const SuccessMessage = ({ message, error }: SuccessMessageProps) => {
   if (error) return null;
-  return <div className="success">{message}</div>;
+  return <div className="success-text">{message}</div>;
 };
 
 export default SuccessMessage;
